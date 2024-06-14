@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ecfxa"
+version = "1.0"
+authors = [
+  { name="Angel Ruiz", email="angel.ruizca@gmail.com" }
+]
+description = "Energy Conversion Factors for X-ray Astronomy"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "astropy",
+  "numpy",
+  "scipy",
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: POSIX :: Linux",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Astronomy",
+]
+
+[tool.setuptools.packages.find]
+# scanning for namespace packages is true by default in pyproject.toml, so
+# you do NOT need to include the following line.
+namespaces = true
+where = ["src"]
+
+[tool.setuptools.package-data]
+ecfxa = [""]
+"ecfxa.data" = ["*.json.gz"]
+
+[project.urls]
+"Homepage" = "https://github.com/ruizca/ecfxa"
