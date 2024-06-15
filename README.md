@@ -21,7 +21,7 @@ For an in-depth explanation of ECF and how they are calculated see
 or the [eROSITA ECF tutorial](https://erosita.mpe.mpg.de/dr1/eSASS4DR1/eSASS4DR1_arfrmf/eROSITA_ECF_tutorial.pdf).
 
 Details about our ECF calculations for the different missions can 
-be found in the [corresponding Jupyter notebooks](hhttps://github.com/ruizca/ecfxa/tree/main/calc) included 
+be found in the [corresponding Jupyter notebooks](https://github.com/ruizca/ecfxa/tree/main/calc) included 
 in this repository.
 
 Examples
