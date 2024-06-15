@@ -33,11 +33,13 @@ class SwiftXRT:
 
     ECF with no absorption correction:
 
-    >>> xrtpc_ecf(5e21, 1.9)
+    >>> xrtpc_ecf(nh=5e21, gamma=1.9)
+    <Quantity 5.20816877e+10 cm2 / erg>
     
     ECF including absorption correction:
 
     >>> xrtpc_ecf(5e21, 1.9, abscorr=True)
+    <Quantity 3.03442833e+10 cm2 / erg>
     
     - Show grades for the different modes:
     
@@ -79,7 +81,7 @@ class SwiftXRT:
     }
 
     def __init__(self, mode, grade="0", eband="SOFT", date=None):
-        self.ecf = SWXRTECFValues()
+        self._ecf = SWXRTECFValues()
 
         # Attributes set in the parse method
         self._parse_args(mode, grade, eband, date)
@@ -133,23 +135,23 @@ class SwiftXRT:
 
     def _set_interpolators(self):
         ecf_values_nocorr = np.array(
-            self.ecf.nocorr[self.mode][self.epoch][self.grade][self.eband]
+            self._ecf.nocorr[self.mode][self.epoch][self.grade][self.eband]
         )
         ecf_values_abscorr = np.array(
-            self.ecf.abscorr[self.mode][self.epoch][self.grade][self.eband]
+            self._ecf.abscorr[self.mode][self.epoch][self.grade][self.eband]
         )
         
         interpolator = {
             "nocorr": RectBivariateSpline(
-                self.ecf.nocorr["lognh"],
-                self.ecf.nocorr["gamma"],
+                self._ecf.nocorr["lognh"],
+                self._ecf.nocorr["gamma"],
                 ecf_values_nocorr,
                 kx=1,
                 ky=1,
             ),
             "abscorr": RectBivariateSpline(
-                self.ecf.nocorr["lognh"],
-                self.ecf.nocorr["gamma"],
+                self._ecf.abscorr["lognh"],
+                self._ecf.abscorr["gamma"],
                 ecf_values_abscorr,
                 kx=1,
                 ky=1,
@@ -162,11 +164,11 @@ class SwiftXRT:
         lognh = np.log10(nh)
 
         # Keep values of lognh and gamma between interpolation limits
-        lognh = np.maximum(lognh, self.ecf.nocorr["lognh"][0])
-        lognh = np.minimum(lognh, self.ecf.nocorr["lognh"][-1])
+        lognh = np.maximum(lognh, self._ecf.nocorr["lognh"][0])
+        lognh = np.minimum(lognh, self._ecf.nocorr["lognh"][-1])
 
-        gamma = np.maximum(gamma, self.ecf.nocorr["gamma"][0])
-        gamma = np.minimum(gamma, self.ecf.nocorr["gamma"][-1])
+        gamma = np.maximum(gamma, self._ecf.nocorr["gamma"][0])
+        gamma = np.minimum(gamma, self._ecf.nocorr["gamma"][-1])
 
         if abscorr:
             ecf = self._interpolators["abscorr"].ev(lognh, gamma)

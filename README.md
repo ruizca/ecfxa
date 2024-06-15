@@ -21,11 +21,12 @@ For an in-depth explanation of ECF and how they are calculated see
 or the [eROSITA ECF tutorial](https://erosita.mpe.mpg.de/dr1/eSASS4DR1/eSASS4DR1_arfrmf/eROSITA_ECF_tutorial.pdf).
 
 Details about our ECF calculations for the different missions can 
-be found in the [corresponding Jupyter notebooks](https://github.com/ruizca/ecfxa/calc/) included 
+be found in the [corresponding Jupyter notebooks](hhttps://github.com/ruizca/ecfxa/tree/main/calc) included 
 in this repository.
 
 Examples
 --------
 
-We provide a [Jupyter notebook with examples](https://github.com/ruizca/ecfxa/docs/example.ipynb) 
-on how to use ecfxa for different X-ray missions.
+We provide a [Jupyter notebook with examples](https://github.com/ruizca/ecfxa/tree/main/docs/examples.ipynb) 
+on how to use `ecfxa` for different X-ray missions. Check the full 
+documentation [here](https://ruizca.github.io/ecfxa/ecfxa/ecfs.html).

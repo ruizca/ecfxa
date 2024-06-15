@@ -17,10 +17,10 @@ class eROSITA:
     Energy Conversion Factors (ECFs) for the eROSITA instrument on-board the Spektr-RG mission.
 
     We include ECF estimates for the different energy bands used in eROSITA products. ECFs 
-    were estimated assuming an absorbed powerlaw. Once a eROSITA instance is initialized for 
-    a given mode, grade, energy band and date, ECFs values can be obtained for different 
-    values of NH and photon index. Returned ECFs are in units of counts × cm² / erg and it 
-    is possible to include the correction due to absorption.
+    were estimated assuming an absorbed powerlaw. Once an eROSITA instance is initialized for 
+    a given energy band, ECFs values can be obtained for different values of NH and photon 
+    index. Returned ECFs are in units of counts × cm² / erg and it is possible to include 
+    the correction due to absorption.
     
     Examples
     --------
@@ -32,10 +32,12 @@ class eROSITA:
     ECF with no absorption correction:
     
     >>> ero_ecf(nh=5e21, gamma=1.9)
+    <Quantity 9.70689828e+11 cm2 / erg>
     
     ECF including absorption correction:
 
     >>> ero_ecf(5e21, 1.9, abscorr=True)
+    <Quantity 5.67143189e+11 cm2 / erg>
      
     - Show available energy bands:
     
@@ -72,7 +74,7 @@ class eROSITA:
     }
 
     def __init__(self, eband="SOFT", date=None):
-        self.ecf = eROSITAECFValues()
+        self._ecf = eROSITAECFValues()
 
         # Attributes set in the parse method
         self._parse_args(eband, date)
@@ -111,23 +113,23 @@ class eROSITA:
 
     def _set_interpolators(self):
         ecf_values_nocorr = np.array(
-            self.ecf.nocorr[self.epoch][self.eband]
+            self._ecf.nocorr[self.epoch][self.eband]
         )
         ecf_values_abscorr = np.array(
-            self.ecf.abscorr[self.epoch][self.eband]
+            self._ecf.abscorr[self.epoch][self.eband]
         )
         
         interpolator = {
             "nocorr": RectBivariateSpline(
-                self.ecf.nocorr["lognh"],
-                self.ecf.nocorr["gamma"],
+                self._ecf.nocorr["lognh"],
+                self._ecf.nocorr["gamma"],
                 ecf_values_nocorr,
                 kx=1,
                 ky=1,
             ),
             "abscorr": RectBivariateSpline(
-                self.ecf.nocorr["lognh"],
-                self.ecf.nocorr["gamma"],
+                self._ecf.abscorr["lognh"],
+                self._ecf.abscorr["gamma"],
                 ecf_values_abscorr,
                 kx=1,
                 ky=1,
@@ -140,11 +142,11 @@ class eROSITA:
         lognh = np.log10(nh)
 
         # Keep values of lognh and gamma between interpolation limits
-        lognh = np.maximum(lognh, self.ecf.nocorr["lognh"][0])
-        lognh = np.minimum(lognh, self.ecf.nocorr["lognh"][-1])
+        lognh = np.maximum(lognh, self._ecf.nocorr["lognh"][0])
+        lognh = np.minimum(lognh, self._ecf.nocorr["lognh"][-1])
 
-        gamma = np.maximum(gamma, self.ecf.nocorr["gamma"][0])
-        gamma = np.minimum(gamma, self.ecf.nocorr["gamma"][-1])
+        gamma = np.maximum(gamma, self._ecf.nocorr["gamma"][0])
+        gamma = np.minimum(gamma, self._ecf.nocorr["gamma"][-1])
 
         if abscorr:
             ecf = self._interpolators["abscorr"].ev(lognh, gamma)

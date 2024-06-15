@@ -29,8 +29,8 @@ class XMMEPIC:
     safe to use the default values. MOS detectors show higher variation across different 
     epochs, but still within ~2-3 per cent in the most extreme cases.
 
-    The default values we use correspond to those assumed by Rossen+2016 for estimating
-    fluxes for the XMM-Newton serendipitous catalogues.
+    The default values we use correspond to those assumed by [Rosen+2016](https://doi.org/10.1051/0004-6361/201526416) 
+    for estimating fluxes for the XMM-Newton serendipitous catalogues.
     
     Examples
     --------
@@ -122,7 +122,7 @@ class XMMEPIC:
     }
 
     def __init__(self, detector, filter, eband="SOFT", mode=None, date=None):
-        self.ecf = XMMECFValues()
+        self._ecf = XMMECFValues()
 
         # Attributes set in the parse method
         self._parse_args(detector, filter, eband, mode, date)
@@ -195,23 +195,23 @@ class XMMEPIC:
 
     def _set_interpolators(self):
         ecf_values_nocorr = np.array(
-            self.ecf.nocorr[self.detector.tag][self.epoch][self.mode][self.eband][self.filter]
+            self._ecf.nocorr[self.detector.tag][self.epoch][self.mode][self.eband][self.filter]
         )
         ecf_values_abscorr = np.array(
-            self.ecf.abscorr[self.detector.tag][self.epoch][self.mode][self.eband][self.filter]
+            self._ecf.abscorr[self.detector.tag][self.epoch][self.mode][self.eband][self.filter]
         )
         
         interpolator = {
             "nocorr": RectBivariateSpline(
-                self.ecf.nocorr["lognh"],
-                self.ecf.nocorr["gamma"],
+                self._ecf.nocorr["lognh"],
+                self._ecf.nocorr["gamma"],
                 ecf_values_nocorr,
                 kx=1,
                 ky=1,
             ),
             "abscorr": RectBivariateSpline(
-                self.ecf.nocorr["lognh"],
-                self.ecf.nocorr["gamma"],
+                self._ecf.abscorr["lognh"],
+                self._ecf.abscorr["gamma"],
                 ecf_values_abscorr,
                 kx=1,
                 ky=1,
@@ -224,11 +224,11 @@ class XMMEPIC:
         lognh = np.log10(nh)
 
         # Keep values of lognh and gamma between interpolation limits
-        lognh = np.maximum(lognh, self.ecf.nocorr["lognh"][0])
-        lognh = np.minimum(lognh, self.ecf.nocorr["lognh"][-1])
+        lognh = np.maximum(lognh, self._ecf.nocorr["lognh"][0])
+        lognh = np.minimum(lognh, self._ecf.nocorr["lognh"][-1])
 
-        gamma = np.maximum(gamma, self.ecf.nocorr["gamma"][0])
-        gamma = np.minimum(gamma, self.ecf.nocorr["gamma"][-1])
+        gamma = np.maximum(gamma, self._ecf.nocorr["gamma"][0])
+        gamma = np.minimum(gamma, self._ecf.nocorr["gamma"][-1])
 
         if abscorr:
             ecf = self._interpolators["abscorr"].ev(lognh, gamma)
